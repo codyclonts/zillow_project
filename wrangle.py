@@ -49,8 +49,12 @@ def make_int(df):
 
 def handle_outliers(df):
     df = df[df.bathroomcnt <= 6]
+
+    df = df[df.bathroomcnt >= 1]
     
     df = df[df.bedroomcnt <= 6]
+
+    df = df[df.bedroomcnt >= 1]
 
     df = df[df.taxvaluedollarcnt < 4_000_000]
 
@@ -69,6 +73,13 @@ def split_zillow_data(df):
     return train, validate, test
 
 
+def fips2(fips):
+  if fips == 'LA':
+    return 6037
+  elif fips == 'Orange':
+    return 6059
+  else:
+    return 6111
 
 def wrangle_zillow():
     df= get_zillow_data()
@@ -76,6 +87,8 @@ def wrangle_zillow():
     df = make_int(df)
     df = handle_outliers(df)
     df['fips'].replace({6037 : 'LA' , 6059 : 'Orange' , 6111: 'Ventura'}, inplace = True)
+    df['age'] = 2022 - df.yearbuilt
+    df["fips2"] = df["fips"].apply(lambda fips: fips2(fips))
     return df 
 
 
