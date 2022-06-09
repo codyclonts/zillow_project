@@ -15,6 +15,9 @@ from scipy import stats
 import env
 import wrangle
 from itertools import combinations
+from sklearn.preprocessing import MinMaxScaler
+
+
 
 
 
