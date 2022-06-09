@@ -7,6 +7,11 @@ import seaborn as sns
 import numpy as np
 from env import get_db_url
 from sklearn.model_selection import train_test_split
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+
+
 
 
 
@@ -90,5 +95,31 @@ def wrangle_zillow():
     df['age'] = 2022 - df.yearbuilt
     df["fips2"] = df["fips"].apply(lambda fips: fips2(fips))
     return df 
+
+
+def data_scaled(train, validate, test, columns_to_scale):
+    '''
+    This function takes in train, validate, test subsets of the cleaned zillow dataset and using the train subset creates a min_max 
+    scaler. It thens scales the subsets and returns the train, validate, test subsets as scaled versions of the initial data.
+    Arguments:  train, validate, test - split subsets from of the cleaned zillow dataframe
+                columns_to_scale - a list of column names to scale
+    Return: scaled_train, scaled_validate, scaled_test - dataframe with scaled versions of the initial unscaled dataframes 
+    '''
+    train_scaled = train.copy()
+    validate_scaled = validate.copy()
+    test_scaled = test.copy()
+    
+    scaler = MinMaxScaler()
+    
+    train_scaled[columns_to_scale] = pd.DataFrame(scaler.fit_transform(train[columns_to_scale]), 
+                                                  columns=train[columns_to_scale].columns.values).set_index([train.index.values])
+
+    validate_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(validate[columns_to_scale]),
+                                                  columns=validate[columns_to_scale].columns.values).set_index([validate.index.values])
+    
+    test_scaled[columns_to_scale] = pd.DataFrame(scaler.transform(test[columns_to_scale]),
+                                                 columns=test[columns_to_scale].columns.values).set_index([test.index.values])
+
+    return train_scaled, validate_scaled, test_scaled
 
 
